@@ -13,7 +13,6 @@ A lightweight, interactive disk space analyzer for Windows. Navigate through you
 - 💾 **Drive detection** — Automatically detects available drives (C:\, D:\, etc.)
 - ⚡ **Smart caching** — Going back is instant (no rescan needed)
 - 🔄 **Refresh on demand** — Press 'r' to rescan current folder
-- 🛡️ **Error handling** — Gracefully handles permission-denied folders
 
 ## Screenshot
 
@@ -52,72 +51,21 @@ Current: C:\Users\John
 | `0-99` | Enter the folder at that index  |
 | `b`    | Go back to parent folder        |
 | `r`    | Refresh (rescan current folder) |
-| `X`    | Close the window to exit        |
 
 ### Command Line
 
 ```bash
-# Run with drive selection menu
-diskscope.exe
-
-# Scan a specific path directly
-diskscope.exe C:\Users\John\Documents
-
-# Show help
-diskscope.exe --help
+diskscope.exe              # Run with drive selection
+diskscope.exe C:\Users     # Scan a specific path
+diskscope.exe --help       # Show help
 ```
 
 ## Building from Source
-
-### Requirements
-
-- C++17 compiler (g++ 8+, MSVC 2017+, or Clang 7+)
-- Windows 10/11
-
-### With g++ (MinGW/MSYS2)
 
 ```bash
 g++ -std=c++17 -O2 -static diskscope.cpp -o diskscope.exe
 ```
 
-### With MSVC
-
-```bash
-cl /EHsc /O2 /std:c++17 diskscope.cpp
-```
-
-## How It Works
-
-1. **Drive Detection** — Uses Windows API (`GetDriveTypeA`) to find available drives
-2. **Size Calculation** — Recursively walks directories using `std::filesystem`
-3. **Caching** — Stores visited folder data in a history stack for instant back-navigation
-4. **Display** — Sorts folders by size (largest first) for easy identification
-
-## Project Structure
-
-```
-DiskScope/
-├── diskscope.cpp    # All source code (single file)
-├── diskscope.exe    # Compiled executable
-└── README.md        # This file
-```
-
-## Technical Details
-
-- **Language**: C++17
-- **Dependencies**: None (uses only standard library + Windows API)
-- **Binary size**: ~200KB (static build)
-- **Memory usage**: Minimal (only current level + history cached)
-
 ## License
 
 MIT License — feel free to use, modify, and distribute.
-
-## Contributing
-
-Pull requests welcome! Some ideas for improvements:
-
-- [ ] Show file count per folder
-- [ ] Export results to file
-- [ ] Color-coded output based on size
-- [ ] Linux/macOS support
