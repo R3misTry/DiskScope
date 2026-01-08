@@ -11,6 +11,7 @@ A lightweight, interactive disk space analyzer for Windows. Navigate through you
 
 - 🖥️ **Interactive navigation** — Browse folders like a file explorer
 - 📊 **Size calculation** — See total size of each folder
+- 🚀 **Multi-threaded High Performance Scanning** — Scans multiple folders in parallel for maximum speed.
 - 💾 **Drive detection** — Automatically finds your drives (C:\, D:\, etc.)
 - ⚡ **Smart caching** — Going back is instant
 - 🔄 **Refresh** — Press 'r' to rescan

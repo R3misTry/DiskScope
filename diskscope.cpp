@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdint>
+#include <future>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -124,23 +125,43 @@ std::vector<FolderEntry> getSubfolders(const fs::path& parentPath) {
     if (ec) {
         return folders; // Empty if can't read
     }
+
+    struct Task {
+        std::future<std::uintmax_t> future;
+        std::string name;
+        fs::path path;
+    };
+    std::vector<Task> tasks;
     
+    std::cout << "  Scanning subfolders (Parallel Mode)... " << std::flush;
+
     for (const auto& entry : dirIter) {
         std::error_code entryEc;
         
         // Only process directories
         if (entry.is_directory(entryEc) && !entryEc && !entry.is_symlink(entryEc)) {
-            FolderEntry folder;
-            folder.name = entry.path().filename().string();
-            folder.path = entry.path();
-            folder.accessDenied = false;
-            
-            // Calculate recursive size
-            std::cout << "  Calculating: " << folder.name << "...\r" << std::flush;
-            folder.size = calculateFolderSize(entry.path());
-            
-            folders.push_back(folder);
+            // Launch async task for each folder
+            // std::launch::async forces a new thread (or implementation defined logic)
+            tasks.push_back({
+                std::async(std::launch::async, calculateFolderSize, entry.path()),
+                entry.path().filename().string(),
+                entry.path()
+            });
         }
+    }
+    
+    // Collect results
+    for (auto& task : tasks) {
+        FolderEntry folder;
+        folder.name = task.name;
+        folder.path = task.path;
+        folder.accessDenied = false;
+        
+        // .get() waits for the thread to finish
+        folder.size = task.future.get();
+        
+        folders.push_back(folder);
+        // std::cout << "." << std::flush; // Optional: Show progress dots
     }
     
     // Sort by size descending (largest first)
