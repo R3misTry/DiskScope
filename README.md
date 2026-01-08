@@ -33,17 +33,27 @@ Current: C:\Users\John
 
 ## Installation
 
-### Download
+### Option 1: Download exe
 
 1. Go to [Releases](../../releases)
 2. Download `diskscope.exe`
 3. Run it!
 
-### Build from source
+### Option 2: Build from source
 
-```bash
-g++ -std=c++17 -O2 -static diskscope.cpp -o diskscope.exe
-```
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/R3misTry/DiskScope.git
+   cd DiskScope
+   ```
+2. Compile:
+   ```bash
+   g++ -std=c++17 -O2 -static diskscope.cpp -o diskscope.exe
+   ```
+3. Run:
+   ```bash
+   ./diskscope.exe
+   ```
 
 ## Usage
 
