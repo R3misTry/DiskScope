@@ -5,6 +5,7 @@ A lightweight, interactive disk space analyzer for Windows. Navigate through you
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
 ![Windows](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Downloads](https://img.shields.io/github/downloads/R3misTry/DiskScope/total.svg)
 
 ## Features
 
