@@ -31,11 +31,28 @@ Current: C:\Users\John
 >
 ```
 
+## Installation
+
+### Download
+
+1. Go to [Releases](../../releases)
+2. Download `diskscope.exe`
+3. Run it!
+
+### Build from source
+
+```bash
+g++ -std=c++17 -O2 -static diskscope.cpp -o diskscope.exe
+```
+
 ## Usage
 
-1. Download `diskscope.exe` from [Releases](../../releases)
-2. Double-click to run
-3. Select a drive and explore!
+Run the program and select a drive:
+
+```bash
+diskscope.exe              # Shows drive selection menu
+diskscope.exe C:\Users     # Scan a specific folder
+```
 
 ### Controls
 
@@ -44,14 +61,6 @@ Current: C:\Users\John
 | `0-99` | Enter folder |
 | `b`    | Go back      |
 | `r`    | Refresh      |
-
-## Building
-
-```bash
-g++ -std=c++17 -O2 -static diskscope.cpp -o diskscope.exe
-```
-
-Requires a C++17 compiler (g++ 8+ or MSVC 2017+).
 
 ## License
 
