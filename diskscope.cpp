@@ -24,6 +24,8 @@
 
 namespace fs = std::filesystem;
 
+
+
 // ============================================================================
 // UTILITIES
 // ============================================================================
@@ -112,6 +114,11 @@ struct FolderEntry {
     std::uintmax_t size;
     bool accessDenied;
 };
+
+// Global Cache: Stores folder Scan Results
+// Key: full_path_string, Value: list of subfolders
+#include <map>
+std::map<std::string, std::vector<FolderEntry>> globalCache;
 
 /**
  * Gets immediate subfolders of a directory with their sizes
@@ -343,73 +350,72 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // Navigation history: stores path + cached folder data
-    // Using pair so we don't rescan when going back
-    struct HistoryEntry {
-        fs::path path;
-        std::vector<FolderEntry> folders;
-    };
-    std::vector<HistoryEntry> history;
+    // Global cache for folder contents
+    std::map<std::string, std::vector<FolderEntry>> globalCache;
+    // History stack for "Back" button
+    std::vector<fs::path> history; // Only store paths
     
-    // Current folder data (cached)
-    std::vector<FolderEntry> currentFolders;
-    bool needsScan = true;  // Flag to trigger scan
-    
-    // Main interactive loop
+    // Main interaction loop
     while (true) {
-        // Only scan if needed (first time or after refresh)
-        if (needsScan) {
-            std::cout << "\nScanning folders...\n";
-            currentFolders = getSubfolders(currentPath);
-            needsScan = false;
+        
+        // 1. SCAN (if not cached)
+        bool needsScan = true;
+        std::vector<FolderEntry> folders;
+        std::string pathKey = currentPath.string();
+
+        if (globalCache.count(pathKey)) {
+             // Found in cache! Use it.
+             folders = globalCache[pathKey];
+             needsScan = false;
         }
+
+        if (needsScan) {
+            std::cout << "\nScanning folders...\n"; // Added this line for user feedback
+            folders = getSubfolders(currentPath);
+            // Save to cache
+            globalCache[pathKey] = folders;
+        }
+
+        // 2. DISPLAY
+        displayCurrentLevel(currentPath, folders);
         
-        // Display current level
-        displayCurrentLevel(currentPath, currentFolders);
-        
-        // Get user input
+        // 3. INPUT
         std::string input;
         std::getline(std::cin, input);
         
-        // Trim whitespace
+        // Trim
         while (!input.empty() && isspace(input.front())) input.erase(input.begin());
         while (!input.empty() && isspace(input.back())) input.pop_back();
-        
-        if (input.empty()) {
-            continue; // Just refresh
-        }
-        
-        // Process input
+
+        if (input.empty()) continue;
+
+        // Process Input
         if (input == "b" || input == "B") {
-            // Go back - use cached data, no rescan!
+            // BACK
             if (!history.empty()) {
-                currentPath = history.back().path;
-                currentFolders = history.back().folders;
+                currentPath = history.back();
                 history.pop_back();
-                needsScan = false;  // Use cached data
             } else {
-                // Try to go to parent (will need scan)
-                fs::path parent = currentPath.parent_path();
-                if (parent != currentPath && !parent.empty()) {
-                    currentPath = parent;
-                    needsScan = true;
-                }
+                // Return to drive selection if at root history
+                currentPath = selectDrive();
             }
         }
         else if (input == "r" || input == "R") {
-            // Refresh - force rescan
-            needsScan = true;
+            // REFRESH (Clear cache for this folder)
+            globalCache.erase(pathKey);
+        }
+        else if (input == "q" || input == "Q") { // Added 'q' for quit
+            break;
         }
         else {
-            // Try to parse as number
+            // TRY ENTER FOLDER
             try {
                 size_t index = std::stoul(input);
-                if (index < currentFolders.size()) {
-                    // Save current state to history (with cached folders)
-                    history.push_back({currentPath, currentFolders});
-                    // Navigate into selected folder
-                    currentPath = currentFolders[index].path;
-                    needsScan = true;  // Need to scan new folder
+                if (index < folders.size()) {
+                    // Push current to history
+                    history.push_back(currentPath);
+                    // Enter new
+                    currentPath = folders[index].path;
                 } else {
                     std::cout << "Invalid selection. Press Enter to continue...";
                     std::cin.get();
