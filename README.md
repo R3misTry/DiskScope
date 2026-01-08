@@ -9,26 +9,21 @@ A lightweight, interactive disk space analyzer for Windows. Navigate through you
 ## Features
 
 - 🖥️ **Interactive navigation** — Browse folders like a file explorer
-- 📊 **Size calculation** — See total size of each folder (including subfolders)
-- 💾 **Drive detection** — Automatically detects available drives (C:\, D:\, etc.)
-- ⚡ **Smart caching** — Going back is instant (no rescan needed)
-- 🔄 **Refresh on demand** — Press 'r' to rescan current folder
+- 📊 **Size calculation** — See total size of each folder
+- 💾 **Drive detection** — Automatically finds your drives (C:\, D:\, etc.)
+- ⚡ **Smart caching** — Going back is instant
+- 🔄 **Refresh** — Press 'r' to rescan
 
-## Screenshot
+## Demo
 
 ```
-============================================================
-  DiskScope - Interactive Disk Explorer
-============================================================
-
 Current: C:\Users\John
 ------------------------------------------------------------
 
-  [ 0] AppData                      76.87 GB
-  [ 1] Desktop                      29.49 GB
-  [ 2] Documents                     1.67 GB
-  [ 3] Downloads                   512.30 MB
-  [ 4] Pictures                    156.20 MB
+  [ 0] AppData          76.87 GB
+  [ 1] Desktop          29.49 GB
+  [ 2] Documents         1.67 GB
+  [ 3] Downloads       512.30 MB
 
 ------------------------------------------------------------
   [num] = enter | 'b' = back | 'r' = refresh
@@ -38,34 +33,26 @@ Current: C:\Users\John
 
 ## Usage
 
-### Download & Run
-
 1. Download `diskscope.exe` from [Releases](../../releases)
 2. Double-click to run
-3. Select a drive and start exploring!
+3. Select a drive and explore!
 
 ### Controls
 
-| Key    | Action                          |
-| ------ | ------------------------------- |
-| `0-99` | Enter the folder at that index  |
-| `b`    | Go back to parent folder        |
-| `r`    | Refresh (rescan current folder) |
+| Key    | Action       |
+| ------ | ------------ |
+| `0-99` | Enter folder |
+| `b`    | Go back      |
+| `r`    | Refresh      |
 
-### Command Line
-
-```bash
-diskscope.exe              # Run with drive selection
-diskscope.exe C:\Users     # Scan a specific path
-diskscope.exe --help       # Show help
-```
-
-## Building from Source
+## Building
 
 ```bash
 g++ -std=c++17 -O2 -static diskscope.cpp -o diskscope.exe
 ```
 
+Requires a C++17 compiler (g++ 8+ or MSVC 2017+).
+
 ## License
 
-MIT License — feel free to use, modify, and distribute.
+MIT
