@@ -1,13 +1,3 @@
-/**
- * DiskScope - Interactive Disk Space Explorer
- * 
- * Navigate through directories and see folder sizes.
- * Uses drill-down navigation instead of printing full tree.
- * 
- * Usage: diskscope [path]
- * Controls: Enter number to navigate, 'b' to go back, 'q' to quit
- */
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -30,9 +20,6 @@ namespace fs = std::filesystem;
 // UTILITIES
 // ============================================================================
 
-/**
- * Converts bytes to human-readable format (KB, MB, GB, TB)
- */
 std::string formatSize(std::uintmax_t bytes) {
     const char* units[] = {"B", "KB", "MB", "GB", "TB"};
     const int numUnits = 5;
@@ -65,10 +52,6 @@ void clearScreen() {
 // SIZE CALCULATION
 // ============================================================================
 
-/**
- * Recursively calculates the total size of a folder
- * Does NOT store the tree structure - just returns the size
- */
 std::uintmax_t calculateFolderSize(const fs::path& folderPath) {
     std::uintmax_t totalSize = 0;
     std::error_code ec;
@@ -115,15 +98,9 @@ struct FolderEntry {
     bool accessDenied;
 };
 
-// Global Cache: Stores folder Scan Results
-// Key: full_path_string, Value: list of subfolders
 #include <map>
 std::map<std::string, std::vector<FolderEntry>> globalCache;
 
-/**
- * Gets immediate subfolders of a directory with their sizes
- * Only calculates ONE level of folders (not recursive listing)
- */
 std::vector<FolderEntry> getSubfolders(const fs::path& parentPath) {
     std::vector<FolderEntry> folders;
     std::error_code ec;
@@ -148,7 +125,6 @@ std::vector<FolderEntry> getSubfolders(const fs::path& parentPath) {
         // Only process directories
         if (entry.is_directory(entryEc) && !entryEc && !entry.is_symlink(entryEc)) {
             // Launch async task for each folder
-            // std::launch::async forces a new thread (or implementation defined logic)
             tasks.push_back({
                 std::async(std::launch::async, calculateFolderSize, entry.path()),
                 entry.path().filename().string(),
@@ -168,7 +144,6 @@ std::vector<FolderEntry> getSubfolders(const fs::path& parentPath) {
         folder.size = task.future.get();
         
         folders.push_back(folder);
-        // std::cout << "." << std::flush; // Optional: Show progress dots
     }
     
     // Sort by size descending (largest first)
@@ -184,9 +159,6 @@ std::vector<FolderEntry> getSubfolders(const fs::path& parentPath) {
 // DISPLAY
 // ============================================================================
 
-/**
- * Displays the current directory and its subfolders
- */
 void displayCurrentLevel(const fs::path& currentPath, const std::vector<FolderEntry>& folders) {
     clearScreen();
     
@@ -230,14 +202,11 @@ void displayCurrentLevel(const fs::path& currentPath, const std::vector<FolderEn
 // DRIVE DETECTION (Windows)
 // ============================================================================
 
-/**
- * Gets list of available drives on Windows (C:\, D:\, etc.)
- */
 std::vector<fs::path> getAvailableDrives() {
     std::vector<fs::path> drives;
     
 #ifdef _WIN32
-    // Check drives A-Z
+    // Check drives
     for (char letter = 'A'; letter <= 'Z'; ++letter) {
         std::string drivePath = std::string(1, letter) + ":\\";
         
@@ -248,7 +217,6 @@ std::vector<fs::path> getAvailableDrives() {
         }
     }
 #else
-    // On Linux/Mac, just use root
     drives.push_back(fs::path("/"));
 #endif
     
@@ -352,8 +320,8 @@ int main(int argc, char* argv[]) {
     
     // Global cache for folder contents
     std::map<std::string, std::vector<FolderEntry>> globalCache;
-    // History stack for "Back" button
-    std::vector<fs::path> history; // Only store paths
+
+    std::vector<fs::path> history;
     
     // Main interaction loop
     while (true) {
@@ -370,7 +338,7 @@ int main(int argc, char* argv[]) {
         }
 
         if (needsScan) {
-            std::cout << "\nScanning folders...\n"; // Added this line for user feedback
+            std::cout << "\nScanning folders...\n";
             folders = getSubfolders(currentPath);
             // Save to cache
             globalCache[pathKey] = folders;
@@ -404,7 +372,7 @@ int main(int argc, char* argv[]) {
             // REFRESH (Clear cache for this folder)
             globalCache.erase(pathKey);
         }
-        else if (input == "q" || input == "Q") { // Added 'q' for quit
+        else if (input == "q" || input == "Q") {
             break;
         }
         else {
